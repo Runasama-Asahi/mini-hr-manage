@@ -1,25 +1,43 @@
 # self-product
 
 #### 介绍
-{**以下是 Gitee 平台说明，您可以替换此简介**
-Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用 Gitee 实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+{**以下是 人事管理系统 说明**}
 
 #### 软件架构
 软件架构说明
+单体架构，非前后端分离
+Spring Boot + Thymeleaf + MySQL + Mybatis Plus + Shiro
 
-
-#### 安装教程
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+登录入口写好，后续的逻辑验证限交给Shiro
+
+LayUI 前端框架 数据是异步加载
+
+特定的数据格式 DataGridView
+
+先加载前端页面，再通过 Ajax 请求后端数据接口，前端再进行加载
+
+# 打卡
+
+上班
+
+下班
+
+同一天内第一次打卡记录上班的情况
+
+第二次打卡记录下班的情况
+
+第三次打卡失效
+
+数据库无用户当天打卡记录，则是上班打卡，存入数据库，上班时间，下班时间为空
+
+数据库有用户当天打卡记录，并且下班时间为空，则是下班打卡，更新数据库，存入下班时间
+
+数据库有用户当天打卡记录，并且下班时间不为空，说明当天已完成上下班考勤，提示打卡无效
+
+同时有迟到、早退、请假等特殊打卡状态进行标注
 
 #### 参与贡献
 
@@ -29,11 +47,6 @@ Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN�
 4.  新建 Pull Request
 
 
-#### 特技
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+
+
