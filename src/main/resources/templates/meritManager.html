@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>绩效管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="/css/public.css" media="all" />
+</head>
+<body class="childrenBody">
+<!-- 数据表格开始-->
+<div>
+    <table class="layui-hide" id="meritTable" lay-filter="meritTable"></table>
+    <div id="meritToolBar" style="display: none;">
+        <button type="button" lay-event="add" class="layui-btn layui-btn-sm " ><span class="layui-icon layui-icon-add-1"></span>添加</button>
+        <button type="button" lay-event="batchDelete" class="layui-btn layui-btn-sm layui-btn-danger" ><span class="layui-icon layui-icon-delete"></span>批量删除</button>
+    </div>
+
+    <div id="meritRowBar" style="display: none;">
+        <button type="button" lay-event="update"  class="layui-btn layui-btn-sm " ><span class="layui-icon layui-icon-edit"></span>编辑</button>
+        <button type="button" lay-event="delete"  class="layui-btn layui-btn-sm layui-btn-danger" ><span class="layui-icon layui-icon-delete"></span>删除</button>
+    </div>
+</div>
+<!-- 添加和修改的弹出层开始 -->
+<div style="display: none;padding: 5px" id="addOrUpdateDiv">
+    <form class="layui-form layui-form-pane" id="dataFrm" lay-filter="dataFrm">
+        <!-- 添加隐藏的 id 字段 -->
+        <input type="hidden" name="id" id="meritId">
+        <div class="layui-form-item">
+            <label class="layui-form-label">选择员工</label>
+            <div class="layui-input-block">
+                <!-- 确保name="uid"与后端接收字段匹配 -->
+                <select name="uid" id="userSelect" lay-verify="required" lay-search>
+                    <option value="">请选择或搜索员工</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">月考核量</label>
+            <div class="layui-input-block">
+                <input type="text" name="monthQuota" id="monthQuota" lay-verify="required|number" autocomplete="off" placeholder="请输入月考核量" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">当前完成量</label>
+            <div class="layui-input-block">
+                <input type="number" name="currentAmount" value="0" lay-verify="required|number" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">考核月份</label>
+            <div class="layui-input-block">
+
+                <input type="text" name="month" id="month" lay-verify="required" placeholder="yyyy-MM"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block" style="text-align: center;">
+                <button type="button" class="layui-btn" lay-submit="" lay-filter="doSubmit" id="doSubmit" ><span class="layui-icon layui-icon-add-1"></span>提交</button>
+                <button type="reset" class="layui-btn layui-btn-warm" id="dataFrmResetBtn"><span class="layui-icon layui-icon-refresh-1"></span>重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<!-- 添加和修改的弹出层结束 -->
+<script type="text/javascript" src="/layui/layui.js"></script>
+<script th:inline="none">
+    layui.use(['jquery', 'form', 'table', 'layer', 'laydate'], function() {
+        var $ = layui.jquery;
+        var form = layui.form;
+        var table = layui.table;
+        var layer = layui.layer;
+        var laydate = layui.laydate;
+        // 初始化月份选择器
+        laydate.render({
+            elem: '#month',       // 绑定到输入框的 ID
+            type: 'month',        // 选择月份模式
+        });
+
+        function initUserSelect(selectedId = 0) {
+            $.get("/user/listm", function(res) {
+                if (res.code == 200) {
+                    var html = '<option value="">请选择员工</option>';
+                    $.each(res.data, function(index, user) {
+                        // 确保使用user.id作为值
+                        html += `<option value="${user.id}" ${user.id == selectedId ? 'selected' : ''}>${user.name}</option>`;
+                    });
+                    $('#userSelect').html(html);
+                    form.render('select'); // 必须重新渲染
+                }
+            });
+        }
+
+        // 数据表格配置
+        var tableIns = table.render({
+            elem: '#meritTable',
+            url: '/merit/loadAllMerit',
+            toolbar: '#meritToolBar',
+            title: '绩效结果数据表',
+            height: 'full-77',
+            page: true,
+            cols: [[
+                { type: 'checkbox', fixed: 'left' },
+                { field: 'uid', title: 'uid', align: 'center', hide: true },
+                { field: 'id', title: 'id', align: 'center', hide: true },
+                { field: 'userName', title: '员工姓名', align: 'center' },
+                { field: 'monthQuota', title: '考核量', align: 'center' },
+                { field: 'currentAmount', title: '当前完成量', align: 'center', edit: 'text' },
+                { field: 'isCompleted', title: '状态', align: 'center', templet: function(d) {
+                        return d.isCompleted == 1 ? '<span class="layui-badge layui-bg-green">已完成</span>'
+                            : '<span class="layui-badge">未完成</span>';
+                    }},
+                { field: 'month', title: '考核月份', align: 'center' },
+                { fixed: 'right', title: '操作', toolbar: '#meritRowBar', align: 'center', width: 200 }
+            ]]
+        });
+        table.on('toolbar(meritTable)', function(obj){
+            switch(obj.event){
+                case 'add':
+                    openAddLayer();
+                    break;
+                case 'batchDelete':
+                    batchDelete();
+                    break;
+            }
+        });
+
+// 监听行工具条事件（编辑/删除）
+        table.on('tool(meritTable)', function(obj){
+            var data = obj.data;
+            switch(obj.event){
+                case 'update':
+                    openUpdateMeritLayer(data);
+                    break;
+                case 'delete':
+                    deletemerit(data);
+                    break;
+            }
+        });
+
+        // 弹层控制逻辑
+        var mainIndex, url;
+
+
+        // 打开添加弹窗
+        function openAddLayer() {
+            layer.open({
+                type: 1,
+                content: $("#addOrUpdateDiv"),
+                success: function() {
+                    $("#dataFrm")[0].reset();
+                    $("#meritId").val("");
+                    initUserSelect(); // 初始化不带选中
+                }
+            });
+        }
+
+// 修改操作
+        // 打开修改弹窗
+        function openUpdateMeritLayer(data) {
+            layer.open({
+                type: 1,
+                content: $("#addOrUpdateDiv"),
+                success: function() {
+                    // 先初始化选择器再填充数据
+                    initUserSelect(data.uid);
+                    // 延迟100ms确保下拉渲染完成
+                    setTimeout(() => {
+                        form.val("dataFrm", data);
+                    }, 100);
+                }
+            });
+        }
+
+// 在页面加载时初始化一次
+        $(function(){
+            initUserSelect();
+        });
+        // 添加搜索监听
+        form.on('select(userSelect)', function(data){
+            console.log("选中员工ID:", data.value);
+        });
+
+// 表单验证增强
+        form.verify({
+            userRequired: function(value) {
+                if (!value) {
+                    return "必须选择员工";
+                }
+            }
+        });
+
+        form.on("submit(doSubmit)", function(formData) {
+            // 将表单数据转换为 JSON 字符串
+            var jsonData = JSON.stringify(formData.field);
+
+            // 使用 $.ajax 发送 JSON 数据
+            $.ajax({
+                url: "/merit/save",
+                type: "POST",
+                contentType: "application/json", // 关键：设置请求头为 JSON
+                data: jsonData,
+                success: function(res) {
+                    layer.msg(res.msg, {icon: res.code === 200 ? 1 : 2});
+                    if (res.code === 200) {
+                        tableIns.reload();
+                        layer.close(mainIndex);
+                    }
+                },
+                error: function(xhr) {
+                    layer.msg("请求失败: " + xhr.statusText, {icon: 2});
+                }
+            });
+            return false;
+        });
+
+
+
+        function deletemerit(data) {
+            layer.confirm('确定删除【' + data.userName + '】的考核记录？', {icon: 3}, function(index) {
+                $.post("/merit/deleteMerit", {id: data.id}, function(res) {
+                    layer.msg(res.msg, {icon: res.code == 200 ? 1 : 2});
+                    res.code == 200 && tableIns.reload();
+                });
+                layer.close(index);
+            });
+        }
+
+        function batchDelete() {
+            var checkStatus = table.checkStatus('meritTable');
+            if (checkStatus.data.length === 0) return layer.msg("请先选择数据", {icon: 2});
+
+            layer.confirm('确定删除选中的' + checkStatus.data.length + '条记录？', {icon: 3}, function(index) {
+                var ids = checkStatus.data.map(item => item.id);
+                $.post("/merit/batchDeleteMerit", {ids: ids}, function(res) {
+                    layer.msg(res.msg, {icon: res.code == 200 ? 1 : 2});
+                    res.code == 200 && tableIns.reload();
+                });
+                layer.close(index);
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
