@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>绩效管理</title>
@@ -73,6 +72,7 @@
 
 <!-- 添加和修改的弹出层结束 -->
 <script type="text/javascript" src="/layui/layui.js"></script>
+<script type="text/javascript" src="/js/auth.js"></script>
 <script th:inline="none">
     layui.use(['jquery', 'form', 'table', 'layer', 'laydate'], function() {
         var $ = layui.jquery;

@@ -41,22 +41,22 @@
 								<td>内测版v114.514</td></tr>
 							<tr>
 								<th>服务器地址</th>
-								<td>127.0.0.1</td></tr>
+								<td>太贵了没钱租</td></tr>
 							<tr>
 								<th>操作系统</th>
 								<td>win11</td></tr>
 							<tr>
 								<th>运行环境</th>
-								<td>Spring Boot</td></tr>
+								<td>樱公馆</td></tr>
 							<tr>
 								<th>MYSQL版本</th>
 								<td>8.0</td></tr>
 							<tr>
 								<th>jdk</th>
-								<td>1.8</td></tr>
+								<td>17</td></tr>
 							<tr>
 								<th>剩余空间</th>
-								<td>100TB</td></tr>
+								<td>唯爱露娜一人</td></tr>
 							</tbody>
 						</table>
 					</div>
@@ -68,11 +68,11 @@
 							<tbody>
 							<tr>
 								<th>版权所有</th>
-								<td>2110警务大队</td>
+								<td>露娜</td>
 							</tr>
 							<tr>
 								<th>开发者</th>
-								<td>警务大队任轩辰</td></tr>
+								<td>Runa</td></tr>
 							</tbody>
 						</table>
 					</div>
@@ -91,7 +91,7 @@
 
 	<script type="text/javascript" src="/layui/layui.js"></script>
 	<script type="text/javascript">
-		var currentUsername = '[[${session.user.name}]]';
+		var currentUsername = '[[${session.user != null ? session.user.name : 用户}]]';
 		var newDate = '';
 		getLangDate();
 		function dateFilter(date){

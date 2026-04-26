@@ -1,0 +1,56 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password:
+    hikari:
+      maximum-pool-size: 5
+      connection-timeout: 30000
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+
+# JWT配置
+jwt:
+  secret: testSecretKeyForJWTTokenGenerationWhichIsLongEnoughForHS512AlgorithmTest
+  expiration: 3600000
+
+# MyBatis Plus配置
+mybatis-plus:
+  mapper-locations: classpath:/com/renxuanchen/mapper/xml/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
+
+# 工作时间配置
+work-up-time: 9
+work-down-time: 18
+work-over-time: 20
+
+# 日志配置
+logging:
+  level:
+    root: WARN
+    com.renxuanchen: DEBUG
+    org.springframework.security: DEBUG
+
+# LangChain4j测试配置（Mock）
+langchain4j:
+  open-ai:
+    chat-model:
+      api-key: mock-api-key
+      base-url: https://mock.example.com/v1
+      model-name: mock-model

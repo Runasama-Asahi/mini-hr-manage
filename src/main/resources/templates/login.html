@@ -63,8 +63,6 @@
 			</div>
 		</form>
 	</div>
-	<script type="text/javascript">
-	</script>
 	<script type="text/javascript" src="/layui/layui.js"></script>
 	<script type="text/javascript">
 		layui.use(['form','layer','jquery'],function(){
@@ -79,15 +77,18 @@
 
 			//登录按钮
 			form.on("submit(login)",function(data){
-				var btn =  $(this);
+				var btn = $(this);
+				
+				
+				
+				
+				
+				
 				btn.text("登录中...").attr("disabled","disabled").addClass("layui-disabled");
 				$.post("/login",data.field,function(rs){
 					btn.text("登录").attr("disabled",false).removeClass("layui-disabled");
 					layer.msg(rs.msg);
-					if(rs.code != 200){
-						layer.msg(rs.msg);
-					}else{
-						layer.msg(rs.msg);
+					if(rs.code == 200){
 						location.href="/index";
 					}
 				});

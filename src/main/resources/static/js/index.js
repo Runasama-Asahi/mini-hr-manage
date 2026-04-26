@@ -100,7 +100,7 @@ layui.use(['bodyTab','form','element','layer','jquery'],function(){
                 openTitle += '<i class="layui-icon layui-unselect layui-tab-close" data-id="' + menu[i].layId + '">&#x1006;</i>';
                 element.tabAdd("bodyTab", {
                     title: openTitle,
-                    content: "<iframe src='" + menu[i].href + "' data-id='" + menu[i].layId + "'></frame>",
+                    content: "<iframe src='" + menu[i].href + "' data-id='" + menu[i].layId + "' frameborder='0' scrolling='yes' style='width:100%;height:100%;'></iframe>",
                     id: menu[i].layId
                 })
                 //定位到刷新前的窗口

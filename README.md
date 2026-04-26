@@ -1,4 +1,5 @@
-# self-product
+# HR 管理系统
+
 
 #### 介绍
 {**以下是 人事管理系统 说明**}
@@ -6,8 +7,20 @@
 #### 软件架构
 软件架构说明
 单体架构，非前后端分离
-Spring Boot + Thymeleaf + MySQL + Mybatis Plus + Shiro
+基于 Spring Boot 3.2.5 + MyBatis Plus + Spring Security + LangChain4j 的 HR 管理系统，支持 AI 智能助手功能。
 
+## 技术栈
+
+| 组件 | 技术 |
+|------|------|
+| 后端框架 | Spring Boot 3.2.5 |
+| Java 版本 | 17 |
+| ORM | MyBatis Plus 3.5.7 |
+| 安全框架 | Spring Security 6 + JWT |
+| AI 框架 | LangChain4j 1.12.2 + LangGraph4j 1.8.13 |
+| 数据库 | MySQL 8.0 |
+| 前端 | Thymeleaf + LayUI + jQuery |
+| API 文档 | SpringDoc OpenAPI 3.0 (Swagger) |
 
 #### 使用说明
 

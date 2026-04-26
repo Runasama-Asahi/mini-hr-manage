@@ -1,7 +1,7 @@
 package com.renxuanchen.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.renxuanchen.common.*;
 import com.renxuanchen.entity.SysRole;
@@ -124,12 +124,12 @@ public class SysUserController {
     @RequestMapping("/initRoleByUserId")
     public DataGridView initRoleByUserId(Integer id){
         //查询全部可用角色
-        QueryWrapper<SysRole> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("available", Constast.AVAILABLE_TRUE);
+        LambdaQueryWrapper<SysRole> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysRole::getAvailable, Constast.AVAILABLE_TRUE);
         List<Map<String, Object>> maps = this.roleService.listMaps(queryWrapper);
         //查询当前用户所拥有的角色
-        QueryWrapper<SysRoleUser> queryWrapper1 = new QueryWrapper<>();
-        queryWrapper1.eq("uid", id);
+        LambdaQueryWrapper<SysRoleUser> queryWrapper1 = new LambdaQueryWrapper<>();
+        queryWrapper1.eq(SysRoleUser::getUid, id);
         List<SysRoleUser> roleUserList = this.roleUserService.list(queryWrapper1);
         for (Map<String, Object> map : maps) {//把role存储map进行遍历，然后进行判断
             Boolean LAY_CHECKED = false;
@@ -144,8 +144,8 @@ public class SysUserController {
 
     @RequestMapping("/updateRole")
     public ResultObj updateRole(Integer[] ids){
-        QueryWrapper<SysRoleUser> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("uid", ids[0]);
+        LambdaQueryWrapper<SysRoleUser> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysRoleUser::getUid, ids[0]);
         this.roleUserService.remove(queryWrapper);
         List<SysRoleUser> list = new ArrayList<>();
         for (int i = 1; i < ids.length; i++) {
@@ -167,7 +167,7 @@ public class SysUserController {
     // 发送验证码接口
     @PostMapping("/sendResetCode")
     public ResultObj sendResetCode(@RequestParam String email) {
-        SysUser user = userService.getOne(new QueryWrapper<SysUser>().eq("email", email));
+        SysUser user = userService.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getEmail, email));
         if (user == null) {
             return new ResultObj(Constast.ERROR, "邮箱未注册");
         }
@@ -196,7 +196,7 @@ public class SysUserController {
             @RequestParam String code,
             @RequestParam String newPassword
     ) {
-        SysUser user = userService.getOne(new QueryWrapper<SysUser>().eq("email", email));
+        SysUser user = userService.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getEmail, email));
         if (user == null) {
             return new ResultObj(Constast.ERROR, "用户不存在");
         }

@@ -1,5 +1,9 @@
 package com.renxuanchen.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,20 +17,23 @@ import lombok.EqualsAndHashCode;
  * @since 2024-03-17
  */
 @Data
-  @EqualsAndHashCode(callSuper = false)
-    public class SysRolePermission implements Serializable {
+@EqualsAndHashCode(callSuper = false)
+@TableName("sys_role_permission")
+public class SysRolePermission implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-      /**
+    /**
      * 角色ID
      */
-        private Integer rid;
+    @TableId(value = "rid", type = IdType.INPUT)
+    private Integer rid;
 
-      /**
+    /**
      * 菜单或权限ID
      */
-      private Integer pid;
+    @TableField("pid")
+    private Integer pid;
 
 
 }

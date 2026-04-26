@@ -1,7 +1,7 @@
 package com.renxuanchen.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.ui.Model;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.renxuanchen.common.DataGridView;
@@ -108,8 +108,8 @@ public class BMeritController {
     }
 
     private void updateSalaryForMerit(Long uid, String month) {
-        QueryWrapper<BSalaryRecord> query = new QueryWrapper<>();
-        query.eq("uid", uid).eq("salary_month", month);
+        LambdaQueryWrapper<BSalaryRecord> query = new LambdaQueryWrapper<>();
+        query.eq(BSalaryRecord::getUid, uid).eq(BSalaryRecord::getSalaryMonth, month);
         BSalaryRecord salary = salaryRecordService.getOne(query);
         if (salary != null) {
             salary.setMeritsAmount(1000f); // 固定奖金1000

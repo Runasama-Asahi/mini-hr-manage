@@ -1,6 +1,6 @@
 package com.renxuanchen.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.renxuanchen.common.UserTreeNode;
 import com.renxuanchen.entity.SysUser;
 import com.renxuanchen.mapper.SysUserMapper;
@@ -34,6 +34,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     public SysUser getByEmail(String email) {
-        return this.getOne(new QueryWrapper<SysUser>().eq("email", email));
+        return this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getEmail, email));
     }
 }

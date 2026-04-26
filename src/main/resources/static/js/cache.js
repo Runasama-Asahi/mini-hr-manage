@@ -97,9 +97,17 @@ layui.use(['form','jquery',"layer"],function() {
 
     //退出
     $(".signOut").click(function(){
+        // 清除JWT令牌
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
+        // 清除菜单缓存
         window.sessionStorage.removeItem("menu");
         menu = [];
         window.sessionStorage.removeItem("curmenu");
+        // 调用后端登出接口
+        $.get("/logout", function() {
+            location.href = "/login";
+        });
     })
 
     //功能设定

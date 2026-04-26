@@ -1,7 +1,7 @@
 package com.renxuanchen.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.renxuanchen.common.DataGridView;
 import com.renxuanchen.common.PageModel;
@@ -10,8 +10,8 @@ import com.renxuanchen.common.WorkStatusEnum;
 import com.renxuanchen.entity.BWorkRecord;
 import com.renxuanchen.entity.SysUser;
 import com.renxuanchen.mapper.BWorkRecordMapper;
+import com.renxuanchen.security.AuthService;
 import com.renxuanchen.service.BWorkRecordService;
-import com.renxuanchen.util.WebUtils;
 import com.renxuanchen.vo.BWorkRecordVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * <p>
- *  前端控制器
+ *  工作记录控制器
  * </p>
  *
  * @author admin
@@ -39,6 +39,8 @@ public class BWorkRecordController {
     private BWorkRecordService workRecordService;
     @Autowired
     private BWorkRecordMapper workRecordMapper;
+    @Autowired
+    private AuthService authService;
     @Value("${work-up-time}")
     private Integer upTime;
     @Value("${work-down-time}")
@@ -46,6 +48,9 @@ public class BWorkRecordController {
     @Value("${work-over-time}")
     private Integer overTime;
 
+    /**
+     * 加载所有工作记录
+     */
     @RequestMapping("/loadAllWorkRecord")
     public DataGridView loadAllWorkRecord(PageModel pageModel){
         Page<BWorkRecord> page = new Page<>(pageModel.getPage(), pageModel.getLimit());
@@ -60,14 +65,18 @@ public class BWorkRecordController {
         return new DataGridView(resultPage.getTotal(), list);
     }
 
+    /**
+     * 添加工作记录（打卡）
+     */
     @RequestMapping("/addWorkRecord")
     public ResultObj addWorkRecord(BWorkRecord workRecord){
-        SysUser user = (SysUser) WebUtils.getSession().getAttribute("user");
+        // 获取当前登录用户
+        SysUser user = authService.getCurrentUser();
         workRecord.setUid(user.getId());
         //判断上班或下班
-        QueryWrapper<BWorkRecord> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("uid", workRecord.getUid())
-                .eq("work_date", workRecord.getWorkDate());
+        LambdaQueryWrapper<BWorkRecord> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(BWorkRecord::getUid, workRecord.getUid())
+                .eq(BWorkRecord::getWorkDate, workRecord.getWorkDate());
         BWorkRecord one = this.workRecordService.getOne(queryWrapper);
         if(one == null){
             //上班
@@ -107,6 +116,5 @@ public class BWorkRecordController {
             return ResultObj.ADD_WORK_ERROR;
         }
     }
-
 }
 

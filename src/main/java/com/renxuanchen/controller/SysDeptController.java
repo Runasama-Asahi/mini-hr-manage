@@ -1,7 +1,7 @@
 package com.renxuanchen.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.renxuanchen.common.DataGridView;
 import com.renxuanchen.common.DeptPageModel;
@@ -48,8 +48,8 @@ public class SysDeptController {
     @RequestMapping("/loadAllDept")
     public DataGridView loadAllDept(DeptPageModel pageModel){
         Page<SysDept> page = new Page<>(pageModel.getPage(),pageModel.getLimit());
-        QueryWrapper<SysDept> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq(pageModel.getId()!=null, "id", pageModel.getId());
+        LambdaQueryWrapper<SysDept> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(pageModel.getId()!=null, SysDept::getId, pageModel.getId());
         Page<SysDept> resultPage = this.deptService.page(page, queryWrapper);
         return new DataGridView(resultPage.getTotal(), resultPage.getRecords());
     }
@@ -77,8 +77,8 @@ public class SysDeptController {
 
     @RequestMapping("/checkDeptHasChildrenNode")
     public Map<String, Boolean> checkDeptHasChildrenNode(Integer id){
-        QueryWrapper<SysDept> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("pid",id);
+        LambdaQueryWrapper<SysDept> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysDept::getPid, id);
         List<SysDept> deptList = this.deptService.list(queryWrapper);
         Map<String, Boolean> map = new HashMap<>();
         if(deptList.size() > 0){

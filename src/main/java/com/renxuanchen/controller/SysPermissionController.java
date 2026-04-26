@@ -6,7 +6,7 @@ import com.renxuanchen.common.TreeNode;
 import com.renxuanchen.entity.SysPermission;
 import com.renxuanchen.entity.SysUser;
 import com.renxuanchen.mapper.SysPermissionMapper;
-import com.renxuanchen.util.WebUtils;
+import com.renxuanchen.security.AuthService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +18,7 @@ import java.util.List;
 
 /**
  * <p>
- *  前端控制器
+ *  权限控制器
  * </p>
  *
  * @author admin
@@ -30,11 +30,19 @@ public class SysPermissionController {
 
     @Autowired
     private SysPermissionMapper permissionMapper;
+    
+    @Autowired
+    private AuthService authService;
 
+    /**
+     * 加载左侧菜单
+     * 根据当前登录用户的角色加载对应的权限
+     * @return 菜单树
+     */
     @RequestMapping("/loadIndexLeftMenuJson")
     public DataGridView loadIndexLeftMenuJson(){
-        //结合当前登录用户的角色来加载对应的权限
-        SysUser user = (SysUser) WebUtils.getSession().getAttribute("user");
+        //获取当前登录用户
+        SysUser user = authService.getCurrentUser();
         List<SysPermission> list = this.permissionMapper.getByUserId(user.getId());
         //将list转成TreeNode
         List<TreeNode> treeNodeList = new ArrayList<>();
@@ -56,6 +64,5 @@ public class SysPermissionController {
         }
         return new DataGridView(treeNodeList);
     }
-
 }
 

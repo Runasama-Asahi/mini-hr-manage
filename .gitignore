@@ -4,6 +4,12 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# 忽略所有带 prod 的生产配置文件
+**/application.yml
+
+# 忽略所有环境变量文件
+.env
+
 ### STS ###
 .apt_generated
 .classpath

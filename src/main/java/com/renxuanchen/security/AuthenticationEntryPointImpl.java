@@ -1,0 +1,55 @@
+package com.renxuanchen.security;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.renxuanchen.common.ResultObj;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+
+/**
+ * 认证入口点实现
+ * 处理认证失败的情况
+ */
+@Component
+public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
+
+    @Override
+    public void commence(HttpServletRequest request,
+                         HttpServletResponse response,
+                         AuthenticationException authException) throws IOException, ServletException {
+        // 检查请求是否为API请求
+        String requestURI = request.getRequestURI();
+        boolean isApiRequest = requestURI.startsWith("/user/") ||
+                requestURI.startsWith("/dept/") ||
+                requestURI.startsWith("/role/") ||
+                requestURI.startsWith("/permission/") ||
+                requestURI.startsWith("/workRecord/") ||
+                requestURI.startsWith("/salaryRecord/") ||
+                requestURI.startsWith("/merit/") ||
+                requestURI.startsWith("/trainPlan/") ||
+                requestURI.startsWith("/convertApply/") ||
+                "application/json".equals(request.getHeader("Content-Type")) ||
+                "application/json".equals(request.getHeader("Accept"));
+
+        if (isApiRequest) {
+            // API请求返回JSON格式的错误信息
+            response.setContentType("application/json;charset=UTF-8");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+            // 创建错误响应
+            ResultObj resultObj = new ResultObj(401, "认证失败：" + authException.getMessage());
+
+            // 将结果对象转换为JSON并写入响应
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.writeValue(response.getWriter(), resultObj);
+        } else {
+            // 页面请求重定向到登录页面
+            response.sendRedirect("/login");
+        }
+    }
+}

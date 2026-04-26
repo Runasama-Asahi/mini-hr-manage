@@ -1,0 +1,111 @@
+version: '3.8'
+
+services:
+  # HR 应用服务
+  hr-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hr-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=hr
+      - DB_USERNAME=root
+      - DB_PASSWORD=${DB_PASSWORD:-hr_secure_password}
+      - JWT_SECRET=${JWT_SECRET:-mySecretKeyForJWTTokenGenerationWhichIsLongEnoughForHS512Algorithm}
+      - JWT_EXPIRATION=86400000
+      - HUNYUAN_API_KEY=${HUNYUAN_API_KEY}
+      - LLM_BASE_URL=${LLM_BASE_URL:-https://api.hunyuan.cloud.tencent.com/v1}
+      - LLM_MODEL_NAME=${LLM_MODEL_NAME:-hunyuan-lite}
+      - MONGODB_HOST=mongodb
+      - MONGODB_PORT=27017
+      - PINECONE_API_KEY=${PINECONE_API_KEY}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    networks:
+      - hr-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: hr-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:-hr_secure_password}
+      - MYSQL_DATABASE=hr
+      - MYSQL_CHARSET=utf8mb4
+      - MYSQL_COLLATION=utf8mb4_unicode_ci
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./hr.sql:/docker-entrypoint-initdb.d/hr.sql:ro
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+      - --log-bin-trust-function-creators=1
+    networks:
+      - hr-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_PASSWORD:-hr_secure_password}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # MongoDB 数据库（对话历史存储）
+  mongodb:
+    image: mongo:7.0
+    container_name: hr-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - hr-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Pinecone 向量数据库（可选，需要 API Key）
+  # 取消注释以下内容并设置 PINECONE_API_KEY
+  # pinecone:
+  #   image: pinecone/pinecone:latest
+  #   container_name: hr-pinecone
+  #   ports:
+  #     - "5080:5080"
+  #   environment:
+  #     - PINECONE_API_KEY=${PINECONE_API_KEY}
+  #   networks:
+  #     - hr-network
+  #   restart: unless-stopped
+
+networks:
+  hr-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local
+  mongodb-data:
+    driver: local

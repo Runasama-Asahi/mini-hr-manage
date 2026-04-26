@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>用户管理</title>
@@ -23,7 +22,7 @@
 <div>
     <table class="layui-hide" id="userTable" lay-filter="userTable"></table>
     <div id="userToolBar" style="display: none;">
-        <button type="button" lay-event="add" class="layui-btn layui-btn-sm" shiro:hasPermission="user:create"><span class="layui-icon layui-icon-add-1"></span>添加用户</button>
+        <button type="button" lay-event="add" class="layui-btn layui-btn-sm"><span class="layui-icon layui-icon-add-1"></span>添加用户</button>
     </div>
 
     <div id="userRowBar" style="display: none;">

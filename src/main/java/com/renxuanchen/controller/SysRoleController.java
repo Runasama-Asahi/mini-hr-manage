@@ -1,7 +1,7 @@
 package com.renxuanchen.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.renxuanchen.common.DataGridView;
 import com.renxuanchen.common.PageModel;
@@ -73,8 +73,8 @@ public class SysRoleController {
         //查询所有菜单
         List<SysPermission> permissionList = this.permissionService.list();
         List<TreeNode> treeNodeList = new ArrayList<>();
-        QueryWrapper<SysRolePermission> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("rid",id);
+        LambdaQueryWrapper<SysRolePermission> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysRolePermission::getRid, id);
         List<SysRolePermission> rolePermissionList = this.rolePermissionService.list(queryWrapper);
         for (SysPermission sysPermission : permissionList) {
             TreeNode treeNode = new TreeNode(sysPermission.getId(), sysPermission.getPid(), sysPermission.getTitle(), true);
@@ -89,8 +89,8 @@ public class SysRoleController {
 
     @RequestMapping("/updatePermission")
     public ResultObj updatePermission(Integer[] ids){
-        QueryWrapper<SysRolePermission> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("rid", ids[0]);
+        LambdaQueryWrapper<SysRolePermission> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysRolePermission::getRid, ids[0]);
         this.rolePermissionService.remove(queryWrapper);
         List<SysRolePermission> list = new ArrayList<>();
         for (int i = 1; i < ids.length; i++) {
